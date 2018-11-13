@@ -1,0 +1,16 @@
+module noise_generator
+(
+	clock, enable, q
+);
+
+input logic clock, enable;
+output logic [23:0] q;
+
+logic [2:0] counter;
+
+always_ff @(posedge clock)
+	if(enable)
+		counter <= counter + 1'b1;
+		
+assign Q = {{10{counter[2]}}, counter, 11'd0};
+endmodule
