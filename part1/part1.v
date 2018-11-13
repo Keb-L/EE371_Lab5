@@ -22,10 +22,10 @@ module part1 (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK,
 	// Your code goes here 
 	/////////////////////////////////
 	
-	assign writedata_left = ... not shown
-	assign writedata_right = ... not shown
-	assign read = ... not shown
-	assign write = ... not shown
+	assign writedata_left = (write_ready) ? readdata_left : 24'hFFF_FFF;
+	assign writedata_right = (write_ready) ? readdata_right : 24'hFFF_FFF;
+	assign read = 1'b1;
+	assign write = 1'b1;
 	
 /////////////////////////////////////////////////////////////////////////////////
 // Audio CODEC interface. 
