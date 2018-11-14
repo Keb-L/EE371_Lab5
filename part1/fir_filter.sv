@@ -13,7 +13,7 @@ logic [2:0] i;
 always_comb begin	
 	filter_out = '0;  // Reset accumulator
 	for(i=0; i<7; i++)  // Accumulate
-		filter_out = filter_out + (signal[write_ptr-i] <<< 3);
+		filter_out = filter_out + (signal[write_ptr-i] >>> 3);
 end
 
 assign q = filter_out;
