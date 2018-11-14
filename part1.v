@@ -1,8 +1,10 @@
-module part1 (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK, 
+module part1 (CLOCK_50, CLOCK2_50, KEY, SW, LEDR, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK, 
 		        AUD_DACLRCK, AUD_ADCLRCK, AUD_BCLK, AUD_ADCDAT, AUD_DACDAT);
 
 	input CLOCK_50, CLOCK2_50;
 	input [0:0] KEY;
+	input [9:0] SW;
+	output [9:0] LEDR;
 	// I2C Audio/Video config interface
 	output FPGA_I2C_SCLK;
 	inout FPGA_I2C_SDAT;
@@ -22,10 +24,12 @@ module part1 (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK,
 	// Your code goes here 
 	/////////////////////////////////
 	
-	assign writedata_left = (write_ready) ? readdata_left : 24'hFFF_FFF;
-	assign writedata_right = (write_ready) ? readdata_right : 24'hFFF_FFF;
-	assign read = 1'b1;
-	assign write = 1'b1;
+//	assign writedata_left = readdata_left;
+//	assign writedata_right = readdata_right;
+	assign read =  read_ready;
+	assign write = write_ready;
+	
+	assign LEDR = SW;
 	
 /////////////////////////////////////////////////////////////////////////////////
 // Audio CODEC interface. 
@@ -79,6 +83,26 @@ module part1 (CLOCK_50, CLOCK2_50, KEY, FPGA_I2C_SCLK, FPGA_I2C_SDAT, AUD_XCK,
 		read_ready, write_ready,
 		readdata_left, readdata_right,
 		AUD_DACDAT
+	);
+	
+	fir_filter fir_left(
+		//Inputs
+		CLOCK_50,
+		SW[9],
+		readdata_left,
+		
+		//Outputs
+		writedata_left
+	);
+	
+		fir_filter fir_right(
+		//Inputs
+		CLOCK_50,
+		SW[9],
+		readdata_right,
+		
+		//Outputs
+		writedata_right
 	);
 
 endmodule
