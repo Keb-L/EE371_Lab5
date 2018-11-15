@@ -12,6 +12,7 @@ output logic [23:0] q;
 
 // FIFO variables
 logic [23:0] fifo_in, fifo_out;
+logic [23:0] fifo_inv;
 logic empty, full;
 logic rd, wr;
 
@@ -38,7 +39,8 @@ always_comb begin
 	fifo_in = d >>> N;
 	
 	// Compute filter output
-	accm_d = fifo_in - fifo_out + accm_q;
+	fifo_inv = full ? fifo_out : '0; // Only read the fifo rd output when full
+	accm_d = fifo_in - fifo_inv + accm_q;
 end
 
 assign q = accm_d;

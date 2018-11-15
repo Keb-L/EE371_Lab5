@@ -30,3 +30,38 @@ module fifo
       #(.DATA_WIDTH(DATA_WIDTH), .ADDR_WIDTH(ADDR_WIDTH)) f_unit (.*);
 endmodule
 
+module fifo_testbench();
+parameter DATA_WIDTH=24; // number of bits in a word
+parameter ADDR_WIDTH=3;  // number of address bits
+
+logic clk, reset;
+logic rd, wr;
+logic [DATA_WIDTH-1:0] w_data, r_data;
+logic empty, full;
+
+fifo #(DATA_WIDTH, ADDR_WIDTH) dut (.*);
+
+parameter CLOCK_PERIOD = 20000;
+initial begin
+	clk <= 0;
+	forever #(CLOCK_PERIOD/2) clk <= ~clk;
+end
+
+int i;
+initial begin
+reset = 1;	@(posedge clk);
+wr = 1;		@(posedge clk);
+reset = 0;  
+for(i=1; i<300; i++) begin
+	if(full) 
+		rd = 1;
+	else
+		rd = 0;
+	w_data = i; @(posedge clk);
+end
+					@(posedge clk);
+$stop;
+end
+
+
+endmodule
