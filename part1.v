@@ -18,6 +18,7 @@ module part1 (CLOCK_50, CLOCK2_50, KEY, SW, LEDR, FPGA_I2C_SCLK, FPGA_I2C_SDAT, 
 	wire read_ready, write_ready, read, write;
 	wire [23:0] readdata_left, readdata_right;
 	wire [23:0] writedata_left, writedata_right;
+	wire [23:0] noise;
 	wire reset = ~KEY[0];
 
 	/////////////////////////////////
@@ -85,11 +86,17 @@ module part1 (CLOCK_50, CLOCK2_50, KEY, SW, LEDR, FPGA_I2C_SCLK, FPGA_I2C_SDAT, 
 		AUD_DACDAT
 	);
 	
+	noise_generator noise_gen (
+		CLOCK_50,
+		SW[8],
+		noise,
+	);
+	
 	fir_filter fir_left(
 		//Inputs
 		CLOCK_50,
 		SW[9],
-		readdata_left,
+		(readdata_left + noise),
 		
 		//Outputs
 		writedata_left
@@ -99,7 +106,7 @@ module part1 (CLOCK_50, CLOCK2_50, KEY, SW, LEDR, FPGA_I2C_SCLK, FPGA_I2C_SDAT, 
 		//Inputs
 		CLOCK_50,
 		SW[9],
-		readdata_right,
+		(readdata_right + noise),
 		
 		//Outputs
 		writedata_right

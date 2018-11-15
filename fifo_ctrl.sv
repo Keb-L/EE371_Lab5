@@ -57,7 +57,7 @@ module fifo_ctrl
                      empty_next = 1'b1;
                end
          2'b10: // write
-          //  if (~full_logic) // not full
+            if (~full_logic) // not full
                begin
                   w_ptr_next = w_ptr_succ;
                   empty_next = 1'b0;

@@ -1,35 +1,46 @@
 module fir_filter_fifo
 #(
-		parameter n=8
+	parameter N=8
 )
-(clock, enable, d, q, reset);
+(
+	clock, enable, d, q, reset
+);
 
 input logic clock, enable, reset;
 input logic [23:0] d;
 output logic [23:0] q;
 
-logic [23:0] sample, r_data, invert;
-logic [23:0] filter_out;
+// FIFO variables
+logic [23:0] fifo_in, fifo_out;
 logic empty, full;
-logic [2:0] i;
+logic rd, wr;
 
-fifo #(.DATA_WIDTH(24), .ADDR_WIDTH(n)) fir (.clk(clock), .reset, .rd(1'b1), .wr(1'b1), 
-		.w_data(sample), .empty, .full, .r_data);
+// Accumulator variables
+logic [23:0] accm_d, accm_q;
+// Filter Var
+logic [23:0] filter_out;
 
+
+
+fifo #(.DATA_WIDTH(24), .ADDR_WIDTH(N)) fir (.clk(clock), .reset, .rd, .wr, 
+		.w_data(fifo_in), .empty, .full, .r_data(fifo_out));
+
+D_FF #(24) flipflop (.d(accm_d), .q(accm_q), .clk(clock), .reset);
 		
 always_comb begin
-	sample = d >>> n;
-	invert = r_data * -1;
+	// Read when FIFO is full and filter is enabled
+	rd = (enable & full) ? 1'b1 : 1'b0;
+	
+	// Write when filter is enabled
+	wr = (enable) ? 1'b1 : 1'b0;
+	
+	// Compute next sample
+	fifo_in = d >>> N;
+	
+	// Compute filter output
+	accm_d = fifo_in - fifo_out + accm_q;
 end
 
-logic [23:0] temp_q;
-D_FF #(24) flipflop (.d(sample), .q(temp_q), .clk(clock), .reset);
-
-always_ff @(posedge clock) begin
-	filter_out <= sample + invert + temp_q;
-end
-
-
-assign q = filter_out;
+assign q = accm_d;
 
 endmodule 
