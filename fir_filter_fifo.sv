@@ -3,7 +3,7 @@ module fir_filter_fifo
 	parameter N=3 // 3 bit address
 )
 (
-	clock, enable, d, q, reset, fifo_in, fifo_out, empty, full, rd, wr
+	clock, enable, d, q, reset
 );
 
 input logic clock, enable, reset;
@@ -11,12 +11,12 @@ input logic [23:0] d;
 output logic [23:0] q;
 
 // FIFO variables
-output logic [23:0] fifo_in, fifo_out;
+logic [23:0] fifo_in, fifo_out;
 logic [23:0] fifo_inv;
-output logic empty, full;
-output logic rd, wr;
+logic empty, full;
+logic rd, wr;
 
-logic [N-1:0] counter;
+//logic [N-1:0] counter;
 
 // Accumulator variables
 logic [23:0] accm_d, accm_q;
@@ -28,15 +28,10 @@ fifo #(.DATA_WIDTH(24), .ADDR_WIDTH(N)) fir
 
 D_FF #(24) flipflop (.d(accm_d), .q(accm_q), .clk(clock), .reset);
 
-always_latch
-	if(reset)
-		rd = 1'b0;
-	else if( counter === (2**N - 1) )
-		rd = 1'b1;
 		
 always_comb begin
 	// Read when FIFO is full and filter is enabled
-//	rd = (enable & full) ? 1'b1 : 1'b0;
+	rd = (enable & full) ? 1'b1 : 1'b0;
 	
 	// Write when filter is enabled
 	wr = (enable) ? 1'b1 : 1'b0;
@@ -49,12 +44,6 @@ always_comb begin
 	accm_d = fifo_in - fifo_inv + accm_q;
 end
 
-always_ff @(posedge clock)
-	if(reset)
-		counter <= 0;
-	else
-		counter <= counter + 1'b1;
-
 assign q = accm_d;
 
 endmodule 
@@ -63,9 +52,6 @@ module fir_filter_fifo_testbench();
 	logic clock, enable, reset;
 	logic [23:0] d;
 	logic [23:0] q;
-	logic [23:0] fifo_in, fifo_out;
-	logic empty, full;
-	logic rd, wr;
 	
 	parameter N = 3;
 	

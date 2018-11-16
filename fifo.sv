@@ -17,8 +17,8 @@ module fifo
    logic wr_en, full_tmp;
 
    // body
-   // write enabled only when FIFO is not full 
-   assign wr_en = wr & ~full_tmp;
+   // write enabled only when FIFO is not full or rd asserted
+   assign wr_en = wr & (~full_tmp | rd);
    assign full = full_tmp;
    
    // instantiate fifo control unit
