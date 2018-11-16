@@ -17,7 +17,7 @@ module fifo
    logic wr_en, full_tmp;
 
    // body
-   // write enabled only when FIFO is not full
+   // write enabled only when FIFO is not full 
    assign wr_en = wr & ~full_tmp;
    assign full = full_tmp;
    
@@ -32,7 +32,7 @@ endmodule
 
 module fifo_testbench();
 parameter DATA_WIDTH=24; // number of bits in a word
-parameter ADDR_WIDTH=8;  // number of address bits
+parameter ADDR_WIDTH=3;  // number of address bits
 
 logic clk, reset;
 logic rd, wr;
