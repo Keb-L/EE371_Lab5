@@ -2,7 +2,7 @@
 module fifo
    #(
     parameter DATA_WIDTH=24, // number of bits in a word
-              ADDR_WIDTH=3  // number of address bits
+	 parameter ADDR_WIDTH=3	  // number of bits in an address
    )
    (
     input  logic clk, reset,
@@ -32,7 +32,7 @@ endmodule
 
 module fifo_testbench();
 parameter DATA_WIDTH=24; // number of bits in a word
-parameter ADDR_WIDTH=3;  // number of address bits
+parameter ADDR_WIDTH=8;  // number of address bits
 
 logic clk, reset;
 logic rd, wr;
